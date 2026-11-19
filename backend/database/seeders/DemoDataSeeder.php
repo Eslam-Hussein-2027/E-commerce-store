@@ -8,6 +8,7 @@ use App\Models\Category;
 use App\Models\Expense;
 use App\Models\Order;
 use App\Models\Product;
+use App\Models\Purchase;
 use App\Models\User;
 use App\Services\DashboardService;
 use App\Services\OrderService;
@@ -69,6 +70,13 @@ class DemoDataSeeder extends Seeder
 
     public function run(): void
     {
+        // Never mix demo data into a database that already holds real records.
+        if (Product::query()->exists() || Order::query()->exists() || Purchase::query()->exists()) {
+            $this->command?->warn('Database already contains data - demo data skipped.');
+
+            return;
+        }
+
         mt_srand(20261119);
 
         $this->brothers = User::query()->orderBy('id')->take(2)->get()->all();
