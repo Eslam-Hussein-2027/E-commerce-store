@@ -13,6 +13,27 @@ use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 
 abstract class TestCase extends BaseTestCase
 {
+    /**
+     * Safety net: with a cached config (`php artisan optimize` in production)
+     * Laravel ignores phpunit.xml and would run RefreshDatabase against the
+     * REAL database. Refuse to start before the app (and RefreshDatabase) boots.
+     */
+    protected function setUp(): void
+    {
+        if (is_file(dirname(__DIR__).'/bootstrap/cache/config.php')) {
+            throw new \RuntimeException(
+                'Config is cached — tests would hit the real database. Run `php artisan config:clear` first, '
+                .'then `php artisan optimize` again after the tests.'
+            );
+        }
+
+        parent::setUp();
+
+        if (! $this->app->environment('testing')) {
+            throw new \RuntimeException('Tests must run with APP_ENV=testing.');
+        }
+    }
+
     protected function purchase(Product $product, int $qty, float $unitCost, ?User $paidBy = null): Purchase
     {
         return app(PurchaseService::class)->create([
