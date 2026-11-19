@@ -12,16 +12,10 @@ class OrderStatusRequest extends FormRequest
     {
         return [
             'status' => ['required', Rule::enum(OrderStatus::class)],
-            'delivered_by_user_id' => ['nullable', 'required_if:status,delivered', 'integer', 'exists:users,id'],
+            // Optional here when the order already has an assigned courier; OrderService enforces it.
+            'delivered_by_user_id' => ['nullable', 'integer', 'exists:users,id'],
             'delivery_fee' => ['nullable', 'numeric', 'min:0', 'max:100000'],
             'delivered_at' => ['nullable', 'date'],
-        ];
-    }
-
-    public function messages(): array
-    {
-        return [
-            'delivered_by_user_id.required_if' => 'يجب تحديد من قام بالتوصيل عند تأكيد التسليم.',
         ];
     }
 

@@ -6,7 +6,6 @@ import { applyServerErrors } from '@/lib/api'
 import { useChangeOrderStatus } from '@/lib/queries'
 import { money as fmtMoney } from '@/lib/format'
 import { ORDER_STATUSES, STATUS_ACTIONS } from '@/lib/constants'
-import { useAuth } from '@/auth/AuthContext'
 import Modal from '@/components/ui/Modal'
 import Button from '@/components/ui/Button'
 import FormField, { NumberInput } from '@/components/ui/FormField'
@@ -14,14 +13,13 @@ import UserSelect from '@/components/UserSelect'
 
 const MESSAGES = {
   out_for_delivery: 'سيتم تحويل الطلب إلى «خرج للتوصيل».',
-  delivered: 'تأكيد تسليم الطلب للزبون واستلام المبلغ. سيُضاف ثمن البضاعة إلى عهدة من قام بالتوصيل.',
+  delivered: 'تأكيد تسليم الطلب للزبون واستلام المبلغ. ستُضاف قيمة البضاعة إلى عهدة من قام بالتوصيل.',
   cancelled: 'سيتم إلغاء الطلب وإرجاع كمياته إلى المخزون. لا يمكن التراجع عن الإلغاء.',
   returned: 'سيتم تسجيل الطلب كمرتجع وإرجاع كمياته إلى المخزون، ويُستبعد من الإيرادات. لا يمكن التراجع.',
   pending: 'سيعود الطلب إلى «قيد التجهيز».',
 }
 
 export default function StatusChangeDialog({ order, target, onClose, onDone }) {
-  const { user } = useAuth()
   const change = useChangeOrderStatus()
   const needsCourier = target === 'delivered' || target === 'out_for_delivery'
 
@@ -35,7 +33,8 @@ export default function StatusChangeDialog({ order, target, onClose, onDone }) {
   const { register, handleSubmit, setError, formState: { errors } } = useForm({
     resolver: zodResolver(schema),
     defaultValues: {
-      delivered_by_user_id: order.delivered_by_user_id ?? user?.id,
+      // Pre-select the courier chosen on the order; otherwise force an explicit choice.
+      delivered_by_user_id: order.delivered_by_user_id ?? '',
       delivery_fee: order.delivery_fee ?? 0,
     },
   })
@@ -78,7 +77,7 @@ export default function StatusChangeDialog({ order, target, onClose, onDone }) {
         </div>
         {needsCourier && (
           <FormField label={target === 'delivered' ? 'من قام بالتوصيل؟' : 'من سيقوم بالتوصيل؟'} required={target === 'delivered'} error={errors.delivered_by_user_id?.message}>
-            <UserSelect {...register('delivered_by_user_id')} />
+            <UserSelect placeholder="اختر…" invalid={!!errors.delivered_by_user_id} {...register('delivered_by_user_id')} />
           </FormField>
         )}
         {target === 'delivered' && (

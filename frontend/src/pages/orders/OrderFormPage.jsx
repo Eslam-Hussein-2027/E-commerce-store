@@ -4,7 +4,7 @@ import { useFieldArray, useForm, useWatch } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Plus, Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
-import { z, requiredText, optionalText, money, intNum, idField } from '@/lib/zod'
+import { z, requiredText, optionalText, money, intNum, idField, optionalId } from '@/lib/zod'
 import { api, applyServerErrors } from '@/lib/api'
 import { useItem, useProductOptions, useSave } from '@/lib/queries'
 import { isoDate, money as fmtMoney, normalizeDigits, toNumber } from '@/lib/format'
@@ -14,6 +14,7 @@ import Card from '@/components/ui/Card'
 import Button from '@/components/ui/Button'
 import FormField, { Input, NumberInput, Select, Textarea } from '@/components/ui/FormField'
 import { ListSkeleton } from '@/components/ui/Skeleton'
+import UserSelect from '@/components/UserSelect'
 
 const schema = z.object({
   customer_name: requiredText('أدخل اسم الزبون'),
@@ -21,6 +22,7 @@ const schema = z.object({
   area: optionalText(),
   order_date: z.string().min(1, 'اختر التاريخ'),
   delivery_fee: money({ msg: 'أدخل سعر التوصيل' }),
+  delivered_by_user_id: optionalId(),
   note: optionalText(),
   items: z
     .array(z.object({
@@ -38,7 +40,7 @@ const schema = z.object({
     }),
 })
 
-const FIELDS = ['customer_name', 'phone', 'area', 'order_date', 'delivery_fee', 'note', 'items']
+const FIELDS = ['customer_name', 'phone', 'area', 'order_date', 'delivery_fee', 'delivered_by_user_id', 'note', 'items']
 const emptyRow = { product_id: '', qty: 1, unit_price: '' }
 
 export default function OrderFormPage() {
@@ -62,7 +64,7 @@ export default function OrderFormPage() {
 
   const { register, control, handleSubmit, setValue, getValues, reset, setError, formState: { errors, isSubmitting } } = useForm({
     resolver: zodResolver(schema),
-    defaultValues: { customer_name: '', phone: '', area: '', order_date: isoDate(), delivery_fee: 10, note: '', items: [emptyRow] },
+    defaultValues: { customer_name: '', phone: '', area: '', order_date: isoDate(), delivery_fee: 10, delivered_by_user_id: '', note: '', items: [emptyRow] },
   })
   const { fields, append, remove } = useFieldArray({ control, name: 'items' })
   const items = useWatch({ control, name: 'items' })
@@ -75,6 +77,7 @@ export default function OrderFormPage() {
         area: order.area ?? '',
         order_date: order.order_date,
         delivery_fee: order.delivery_fee,
+        delivered_by_user_id: order.delivered_by_user_id ?? '',
         note: order.note ?? '',
         items: order.items.map((i) => ({ product_id: i.product_id, qty: i.qty, unit_price: i.unit_price })),
       })
@@ -147,7 +150,10 @@ export default function OrderFormPage() {
             <FormField label="تاريخ الطلب" error={errors.order_date?.message}>
               <Input type="date" {...register('order_date')} />
             </FormField>
-            <FormField label="سعر التوصيل (د.ل)" error={errors.delivery_fee?.message} hint="لمن يوصّل — خارج إيرادات المتجر" className="col-span-2 lg:col-span-1">
+            <FormField label="من سيوصّل الطلب؟" error={errors.delivered_by_user_id?.message} hint="عند تأكيد التسليم تُحسب قيمة البضاعة في عهدته">
+              <UserSelect placeholder="لم يُحدد بعد" {...register('delivered_by_user_id')} />
+            </FormField>
+            <FormField label="سعر التوصيل (د.ل)" error={errors.delivery_fee?.message} hint="لمن يوصّل — خارج إيرادات المتجر">
               <NumberInput {...register('delivery_fee')} />
             </FormField>
             <FormField label="ملاحظة" className="col-span-2 lg:col-span-1">

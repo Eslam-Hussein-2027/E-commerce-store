@@ -14,6 +14,8 @@ class OrderRequest extends FormRequest
             'area' => ['nullable', 'string', 'max:100'],
             'order_date' => ['nullable', 'date'],
             'delivery_fee' => ['nullable', 'numeric', 'min:0', 'max:100000'],
+            // Who will deliver it — the goods value goes to his custody once delivered.
+            'delivered_by_user_id' => ['nullable', 'integer', 'exists:users,id'],
             'note' => ['nullable', 'string', 'max:1000'],
             'items' => ['required', 'array', 'min:1', 'max:100'],
             'items.*.product_id' => ['required', 'integer', 'distinct', 'exists:products,id'],

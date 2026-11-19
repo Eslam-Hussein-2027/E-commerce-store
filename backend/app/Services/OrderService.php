@@ -36,6 +36,7 @@ class OrderService
                 'status' => OrderStatus::Pending,
                 'goods_total' => 0,
                 'delivery_fee' => $data['delivery_fee'] ?? 0,
+                'delivered_by_user_id' => $data['delivered_by_user_id'] ?? null,
                 'order_date' => $data['order_date'] ?? now()->toDateString(),
                 'note' => $data['note'] ?? null,
             ]);
@@ -97,6 +98,7 @@ class OrderService
                 'phone' => $data['phone'],
                 'area' => $data['area'] ?? null,
                 'delivery_fee' => $data['delivery_fee'] ?? 0,
+                'delivered_by_user_id' => $data['delivered_by_user_id'] ?? null,
                 'order_date' => $data['order_date'] ?? $order->order_date,
                 'note' => $data['note'] ?? null,
             ]);
@@ -138,7 +140,7 @@ class OrderService
             if ($to === OrderStatus::Delivered) {
                 if (empty($order->delivered_by_user_id)) {
                     throw ValidationException::withMessages([
-                        'delivered_by_user_id' => 'يجب تحديد من قام بالتوصيل.',
+                        'delivered_by_user_id' => 'يجب تحديد من قام بالتوصيل عند تأكيد التسليم.',
                     ]);
                 }
                 $order->delivered_at = $data['delivered_at'] ?? now();
