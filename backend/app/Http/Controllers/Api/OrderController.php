@@ -19,7 +19,6 @@ class OrderController extends Controller
     {
         $query = Order::query()
             ->with(['items.product:id,name,sku', 'deliveredBy:id,name', 'creator:id,name'])
-            ->when($request->filled('status'), fn ($q) => $q->whereIn('status', explode(',', $request->string('status'))))
             ->when($request->filled('search'), function ($q) use ($request) {
                 $search = trim($request->string('search'));
                 $q->where(function ($w) use ($search) {
@@ -36,7 +35,10 @@ class OrderController extends Controller
 
         $this->applyDateRange($query, $request, 'order_date');
 
-        $counts = (clone $query)->reorder()->selectRaw('status, COUNT(*) as c')->groupBy('status')->pluck('c', 'status');
+        // Tab counts ignore the status filter itself.
+        $counts = (clone $query)->toBase()->reorder()->selectRaw('status, COUNT(*) as c')->groupBy('status')->pluck('c', 'status');
+
+        $query->when($request->filled('status'), fn ($q) => $q->whereIn('status', explode(',', $request->string('status'))));
 
         return OrderResource::collection(
             $query->latest('order_date')->latest('id')->paginate($this->perPage($request))

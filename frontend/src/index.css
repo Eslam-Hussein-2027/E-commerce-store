@@ -1,0 +1,37 @@
+@import "@fontsource/cairo/400.css";
+@import "@fontsource/cairo/600.css";
+@import "@fontsource/cairo/700.css";
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Cairo", ui-sans-serif, system-ui, "Segoe UI", Tahoma, sans-serif;
+
+  /* Brand: deep teal */
+  --color-brand-50: #f0fdfa;
+  --color-brand-100: #ccfbf1;
+  --color-brand-200: #99f6e4;
+  --color-brand-500: #14b8a6;
+  --color-brand-600: #0d9488;
+  --color-brand-700: #0f766e;
+  --color-brand-800: #115e59;
+  --color-brand-900: #134e4a;
+}
+
+@layer base {
+  html {
+    -webkit-tap-highlight-color: transparent;
+  }
+  body {
+    @apply bg-slate-50 font-sans text-slate-800 antialiased;
+  }
+  /* Dates/numbers inside RTL text stay readable */
+  input[type="date"],
+  input[type="datetime-local"] {
+    @apply text-end;
+  }
+}
+
+/* Recharts: keep tooltip text RTL-friendly */
+.recharts-tooltip-wrapper {
+  direction: rtl;
+}

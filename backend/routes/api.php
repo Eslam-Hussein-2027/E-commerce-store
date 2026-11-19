@@ -25,6 +25,7 @@ Route::prefix('auth')->group(function () {
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('dashboard', DashboardController::class);
+    Route::get('dashboard/custody', [DashboardController::class, 'custody']);
     Route::get('users', [UserController::class, 'index']);
 
     Route::apiResource('categories', CategoryController::class);

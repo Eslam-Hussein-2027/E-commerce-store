@@ -13,4 +13,10 @@ class DashboardController extends Controller
     {
         return response()->json($dashboard->build($request->from(), $request->to()));
     }
+
+    /** Current cash custody per brother (lightweight, used by the handovers page). */
+    public function custody(DashboardService $dashboard): JsonResponse
+    {
+        return response()->json($dashboard->custody());
+    }
 }
