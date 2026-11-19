@@ -28,34 +28,34 @@ class DemoDataSeeder extends Seeder
 {
     private const CATALOG = [
         'عطور' => [
-            ['PER-001', 'عطر عود ملكي 100 مل', 180, 110],
-            ['PER-002', 'عطر فانيلا 50 مل', 95, 55],
-            ['PER-003', 'بخور معطر (علبة)', 45, 24],
+            ['عطر عود ملكي 100 مل', 180, 110],
+            ['عطر فانيلا 50 مل', 95, 55],
+            ['بخور معطر (علبة)', 45, 24],
         ],
         'ساعات' => [
-            ['WAT-001', 'ساعة كلاسيك رجالية', 150, 92],
-            ['WAT-002', 'ساعة رياضية ذكية', 220, 138],
+            ['ساعة كلاسيك رجالية', 150, 92],
+            ['ساعة رياضية ذكية', 220, 138],
         ],
         'حقائب' => [
-            ['BAG-001', 'حقيبة يد جلد', 175, 100],
-            ['BAG-002', 'حقيبة ظهر', 85, 48],
-            ['BAG-003', 'محفظة رجالية', 60, 30],
+            ['حقيبة يد جلد', 175, 100],
+            ['حقيبة ظهر', 85, 48],
+            ['محفظة رجالية', 60, 30],
         ],
         'إكسسوارات' => [
-            ['ACC-001', 'نظارة شمسية', 70, 35],
-            ['ACC-002', 'سوار فضة', 55, 25],
-            ['ACC-003', 'خاتم فضة', 40, 18],
+            ['نظارة شمسية', 70, 35],
+            ['سوار فضة', 55, 25],
+            ['خاتم فضة', 40, 18],
         ],
         'إلكترونيات' => [
-            ['ELE-001', 'سماعات بلوتوث', 95, 55],
-            ['ELE-002', 'شاحن سريع 20 واط', 35, 18],
-            ['ELE-003', 'باور بانك 10000', 75, 42],
-            ['ELE-004', 'حامل جوال للسيارة', 25, 10],
+            ['سماعات بلوتوث', 95, 55],
+            ['شاحن سريع 20 واط', 35, 18],
+            ['باور بانك 10000', 75, 42],
+            ['حامل جوال للسيارة', 25, 10],
         ],
     ];
 
     /** Never sold → shows up as dead stock. */
-    private const DEAD_SKUS = ['ACC-003', 'ELE-004'];
+    private const DEAD_PRODUCTS = ['خاتم فضة', 'حامل جوال للسيارة'];
 
     private const AREAS = ['طرابلس', 'بنغازي', 'مصراتة', 'الزاوية', 'تاجوراء', 'جنزور', 'سوق الجمعة', 'عين زارة'];
 
@@ -99,12 +99,12 @@ class DemoDataSeeder extends Seeder
             'note' => 'بضاعة افتتاحية',
             'items' => collect($products)->map(fn (Product $p) => [
                 'product_id' => $p->id,
-                'qty' => in_array($p->sku, self::DEAD_SKUS, true) ? 12 : mt_rand(25, 40),
+                'qty' => in_array($p->name, self::DEAD_PRODUCTS, true) ? 12 : mt_rand(25, 40),
                 'unit_cost' => $this->costFor($p),
             ])->values()->all(),
         ]);
 
-        $sellable = collect($products)->reject(fn (Product $p) => in_array($p->sku, self::DEAD_SKUS, true))->values();
+        $sellable = collect($products)->reject(fn (Product $p) => in_array($p->name, self::DEAD_PRODUCTS, true))->values();
         $queue = []; // [resolve_date, order_id, final_status, brother_index]
 
         for ($day = $start; $day->lte($today); $day = $day->addDay()) {
@@ -204,10 +204,9 @@ class DemoDataSeeder extends Seeder
         $products = [];
         foreach (self::CATALOG as $categoryName => $items) {
             $category = Category::create(['name' => $categoryName]);
-            foreach ($items as [$sku, $name, $price]) {
+            foreach ($items as [$name, $price]) {
                 $products[] = Product::create([
                     'name' => $name,
-                    'sku' => $sku,
                     'category_id' => $category->id,
                     'sell_price' => $price,
                     'reorder_level' => $price >= 150 ? 3 : 5,
@@ -222,8 +221,8 @@ class DemoDataSeeder extends Seeder
     private function costFor(Product $p): float
     {
         foreach (self::CATALOG as $items) {
-            foreach ($items as [$sku, , , $cost]) {
-                if ($sku === $p->sku) {
+            foreach ($items as [$name, , $cost]) {
+                if ($name === $p->name) {
                     // ±12% supplier price variation → the weighted average moves over time.
                     return round($cost * mt_rand(88, 112) / 100, 2);
                 }
@@ -237,7 +236,7 @@ class DemoDataSeeder extends Seeder
     {
         $needs = $sellable->map->refresh()
             // Keep the smart watch running low to demonstrate the low-stock list.
-            ->filter(fn (Product $p) => $p->sku !== 'WAT-002' && $p->stock <= $p->reorder_level + 6)
+            ->filter(fn (Product $p) => $p->name !== 'ساعة رياضية ذكية' && $p->stock <= $p->reorder_level + 6)
             ->values();
 
         if ($needs->isEmpty()) {

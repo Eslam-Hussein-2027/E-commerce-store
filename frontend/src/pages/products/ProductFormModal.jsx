@@ -14,14 +14,13 @@ import { toNumber } from '@/lib/format'
 
 const schema = z.object({
   name: requiredText('أدخل اسم المنتج'),
-  sku: requiredText('أدخل رمز المنتج'),
   category_id: optionalId(),
   sell_price: money({ msg: 'أدخل سعر البيع' }),
   reorder_level: z.preprocess((v) => toNumber(v) ?? 0, z.number({ error: 'أدخل رقماً' }).int('عدد صحيح فقط').min(0)),
   is_active: z.boolean(),
 })
 
-const FIELDS = ['name', 'sku', 'category_id', 'sell_price', 'reorder_level', 'is_active']
+const FIELDS = ['name', 'category_id', 'sell_price', 'reorder_level', 'is_active']
 
 export default function ProductFormModal({ product, categories, onClose }) {
   const save = useSave('products')
@@ -33,7 +32,6 @@ export default function ProductFormModal({ product, categories, onClose }) {
     resolver: zodResolver(schema),
     defaultValues: {
       name: product.name ?? '',
-      sku: product.sku ?? '',
       category_id: product.category_id ?? '',
       sell_price: product.sell_price ?? '',
       reorder_level: product.reorder_level ?? 5,
@@ -81,10 +79,7 @@ export default function ProductFormModal({ product, categories, onClose }) {
         <FormField label="اسم المنتج" required error={errors.name?.message} className="col-span-2">
           <Input invalid={!!errors.name} {...register('name')} />
         </FormField>
-        <FormField label="الرمز (SKU)" required error={errors.sku?.message}>
-          <Input dir="ltr" className="uppercase" invalid={!!errors.sku} {...register('sku')} />
-        </FormField>
-        <FormField label="التصنيف" error={errors.category_id?.message}>
+        <FormField label="التصنيف" error={errors.category_id?.message} className="col-span-2">
           <Select {...register('category_id')}>
             <option value="">بدون تصنيف</option>
             {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}

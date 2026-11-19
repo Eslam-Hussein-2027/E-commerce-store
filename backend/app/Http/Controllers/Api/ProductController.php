@@ -18,8 +18,7 @@ class ProductController extends Controller
         $query = Product::query()
             ->with('category:id,name')
             ->when($request->filled('search'), function ($q) use ($request) {
-                $term = $this->likeTerm($request->string('search'));
-                $q->where(fn ($w) => $w->where('name', 'like', $term)->orWhere('sku', 'like', $term));
+                $q->where('name', 'like', $this->likeTerm($request->string('search')));
             })
             ->when($request->filled('category_id'), fn ($q) => $q->where('category_id', $request->integer('category_id')))
             ->when($request->boolean('low_stock'), fn ($q) => $q->lowStock())

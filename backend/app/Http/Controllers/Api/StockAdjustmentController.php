@@ -20,7 +20,7 @@ class StockAdjustmentController extends Controller
     public function index(Request $request): AnonymousResourceCollection
     {
         $query = StockAdjustment::query()
-            ->with(['product:id,name,sku', 'creator:id,name'])
+            ->with(['product:id,name', 'creator:id,name'])
             ->when($request->filled('product_id'), fn ($q) => $q->where('product_id', $request->integer('product_id')))
             ->when($request->filled('reason'), fn ($q) => $q->where('reason', $request->string('reason')))
             ->when($request->filled('user_id'), fn ($q) => $q->where('created_by', $request->integer('user_id')));
@@ -43,6 +43,6 @@ class StockAdjustmentController extends Controller
 
     public function show(StockAdjustment $stockAdjustment): StockAdjustmentResource
     {
-        return new StockAdjustmentResource($stockAdjustment->load(['product:id,name,sku', 'creator:id,name']));
+        return new StockAdjustmentResource($stockAdjustment->load(['product:id,name', 'creator:id,name']));
     }
 }

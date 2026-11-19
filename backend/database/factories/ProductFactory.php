@@ -18,7 +18,6 @@ class ProductFactory extends Factory
     {
         return [
             'name' => 'منتج '.fake()->unique()->numberBetween(1, 99999),
-            'sku' => strtoupper(fake()->unique()->bothify('SKU-####-??')),
             'category_id' => Category::factory(),
             'sell_price' => fake()->randomFloat(2, 20, 200),
             'reorder_level' => 5,

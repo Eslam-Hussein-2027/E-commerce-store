@@ -101,7 +101,6 @@ return [
         'email' => 'البريد الإلكتروني',
         'password' => 'كلمة المرور',
         'current_password' => 'كلمة المرور الحالية',
-        'sku' => 'رمز المنتج (SKU)',
         'category_id' => 'التصنيف',
         'sell_price' => 'سعر البيع',
         'reorder_level' => 'حد إعادة الطلب',

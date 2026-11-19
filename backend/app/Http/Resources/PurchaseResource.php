@@ -25,7 +25,6 @@ class PurchaseResource extends JsonResource
                 'product' => $item->relationLoaded('product') ? [
                     'id' => $item->product->id,
                     'name' => $item->product->name,
-                    'sku' => $item->product->sku,
                 ] : null,
                 'qty' => (int) $item->qty,
                 'unit_cost' => round((float) $item->unit_cost, 4),

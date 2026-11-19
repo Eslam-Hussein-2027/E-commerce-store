@@ -18,7 +18,7 @@ class OrderController extends Controller
     public function index(Request $request): AnonymousResourceCollection
     {
         $query = Order::query()
-            ->with(['items.product:id,name,sku', 'deliveredBy:id,name', 'creator:id,name'])
+            ->with(['items.product:id,name', 'deliveredBy:id,name', 'creator:id,name'])
             ->when($request->filled('search'), function ($q) use ($request) {
                 $search = trim($request->string('search'));
                 $q->where(function ($w) use ($search) {
@@ -52,7 +52,7 @@ class OrderController extends Controller
 
     public function show(Order $order): OrderResource
     {
-        return new OrderResource($order->load(['items.product:id,name,sku', 'deliveredBy:id,name', 'creator:id,name']));
+        return new OrderResource($order->load(['items.product:id,name', 'deliveredBy:id,name', 'creator:id,name']));
     }
 
     public function update(OrderRequest $request, Order $order): OrderResource

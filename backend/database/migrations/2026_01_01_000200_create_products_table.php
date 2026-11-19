@@ -11,7 +11,6 @@ return new class extends Migration
         Schema::create('products', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('sku')->unique();
             $table->foreignId('category_id')->nullable()->constrained()->restrictOnDelete();
             $table->decimal('sell_price', 12, 2)->default(0);
             // Weighted average cost — kept at 4 decimals to avoid rounding drift.

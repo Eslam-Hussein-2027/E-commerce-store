@@ -10,18 +10,11 @@ use Illuminate\Validation\Rule;
  */
 class ProductRequest extends FormRequest
 {
-    protected function prepareForValidation(): void
-    {
-        if ($this->has('sku')) {
-            $this->merge(['sku' => strtoupper(trim((string) $this->input('sku')))]);
-        }
-    }
-
     public function rules(): array
     {
         return [
-            'name' => ['required', 'string', 'max:150'],
-            'sku' => ['required', 'string', 'max:50', Rule::unique('products', 'sku')->ignore($this->route('product'))],
+            // The name is the product's identifier, so it must be unique.
+            'name' => ['required', 'string', 'max:150', Rule::unique('products', 'name')->ignore($this->route('product'))],
             'category_id' => ['nullable', 'integer', 'exists:categories,id'],
             'sell_price' => ['required', 'numeric', 'min:0', 'max:9999999'],
             'reorder_level' => ['nullable', 'integer', 'min:0', 'max:100000'],

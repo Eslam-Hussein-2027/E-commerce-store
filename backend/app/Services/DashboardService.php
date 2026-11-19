@@ -230,8 +230,8 @@ class DashboardService
             ->join('products', 'products.id', '=', 'order_items.product_id')
             ->where('orders.status', OrderStatus::Delivered->value)
             ->whereBetween('orders.delivered_at', [$from, $to])
-            ->groupBy('products.id', 'products.name', 'products.sku')
-            ->selectRaw('products.id, products.name, products.sku')
+            ->groupBy('products.id', 'products.name')
+            ->selectRaw('products.id, products.name')
             ->selectRaw('SUM(order_items.qty) as qty')
             ->selectRaw('SUM(order_items.qty * order_items.unit_price) as revenue')
             ->selectRaw('SUM((order_items.unit_price - order_items.unit_cost) * order_items.qty) as profit')
@@ -241,7 +241,6 @@ class DashboardService
             ->map(fn ($r) => [
                 'id' => (int) $r->id,
                 'name' => $r->name,
-                'sku' => $r->sku,
                 'qty' => (int) $r->qty,
                 'revenue' => round((float) $r->revenue, 2),
                 'profit' => round((float) $r->profit, 2),
@@ -255,11 +254,10 @@ class DashboardService
             ->whereColumn('stock', '<=', 'reorder_level')
             ->orderBy('stock')->orderBy('name')
             ->limit($limit)
-            ->get(['id', 'name', 'sku', 'stock', 'reorder_level'])
+            ->get(['id', 'name', 'stock', 'reorder_level'])
             ->map(fn ($r) => [
                 'id' => (int) $r->id,
                 'name' => $r->name,
-                'sku' => $r->sku,
                 'stock' => (int) $r->stock,
                 'reorder_level' => (int) $r->reorder_level,
             ])->all();
@@ -285,7 +283,7 @@ class DashboardService
                 ->whereIn('orders.status', $sellingStatuses)
                 ->where('orders.order_date', '>=', $since)
                 ->selectRaw('1'))
-            ->select(['id', 'name', 'sku', 'stock', 'avg_cost'])
+            ->select(['id', 'name', 'stock', 'avg_cost'])
             ->selectSub($lastSale, 'last_sold_at')
             ->orderByRaw('stock * avg_cost DESC')
             ->limit($limit)
@@ -293,7 +291,6 @@ class DashboardService
             ->map(fn ($r) => [
                 'id' => (int) $r->id,
                 'name' => $r->name,
-                'sku' => $r->sku,
                 'stock' => (int) $r->stock,
                 'stock_value' => round($r->stock * (float) $r->avg_cost, 2),
                 'last_sold_at' => $r->last_sold_at ? substr((string) $r->last_sold_at, 0, 10) : null,

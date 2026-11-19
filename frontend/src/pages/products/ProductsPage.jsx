@@ -33,7 +33,7 @@ export default function ProductsPage() {
       />
 
       <FilterBar>
-        <SearchInput className="col-span-2 sm:!w-64" value={filters.search} onChange={(v) => setFilter('search', v)} placeholder="ابحث بالاسم أو الرمز…" />
+        <SearchInput className="col-span-2 sm:!w-64" value={filters.search} onChange={(v) => setFilter('search', v)} placeholder="ابحث باسم المنتج…" />
         <Select value={filters.category_id ?? ''} onChange={(e) => setFilter('category_id', e.target.value)}>
           <option value="">كل التصنيفات</option>
           {categories?.data?.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
@@ -60,7 +60,6 @@ export default function ProductsPage() {
             render: (p) => (
               <div>
                 <div className={`font-semibold ${p.is_active ? 'text-slate-900' : 'text-slate-400 line-through'}`}>{p.name}</div>
-                <div className="text-xs text-slate-500" dir="ltr">{p.sku}</div>
               </div>
             ),
           },
@@ -87,10 +86,7 @@ export default function ProductsPage() {
             <div className="flex items-start justify-between gap-2">
               <div className="min-w-0">
                 <div className={`truncate font-semibold ${p.is_active ? 'text-slate-900' : 'text-slate-400 line-through'}`}>{p.name}</div>
-                <div className="text-xs text-slate-500">
-                  <span dir="ltr">{p.sku}</span>
-                  {p.category && ` · ${p.category.name}`}
-                </div>
+                {p.category && <div className="text-xs text-slate-500">{p.category.name}</div>}
               </div>
               <div className="text-end">
                 <div className="text-lg font-bold tabular-nums text-slate-900">{num(p.stock)}</div>

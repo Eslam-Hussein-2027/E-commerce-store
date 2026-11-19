@@ -112,7 +112,7 @@ export default function PurchaseFormPage() {
                     <FormField error={rowErr.product_id?.message} className="flex-1">
                       <Select invalid={!!rowErr.product_id} {...register(`items.${i}.product_id`)}>
                         <option value="">اختر المنتج…</option>
-                        {products.map((pr) => <option key={pr.id} value={pr.id}>{pr.name} ({pr.sku})</option>)}
+                        {products.map((pr) => <option key={pr.id} value={pr.id}>{pr.name}</option>)}
                       </Select>
                     </FormField>
                     <Button size="icon" variant="ghost" icon={Trash2} className="text-rose-600" disabled={fields.length === 1} onClick={() => remove(i)} aria-label="حذف الصنف" />

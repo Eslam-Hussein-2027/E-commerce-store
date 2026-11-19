@@ -14,7 +14,7 @@ class StockMovementController extends Controller
     public function index(Request $request): AnonymousResourceCollection
     {
         $query = StockMovement::query()
-            ->with(['product:id,name,sku', 'creator:id,name'])
+            ->with(['product:id,name', 'creator:id,name'])
             ->when($request->filled('product_id'), fn ($q) => $q->where('product_id', $request->integer('product_id')))
             ->when($request->filled('type'), fn ($q) => $q->where('type', $request->string('type')))
             ->when($request->filled('user_id'), fn ($q) => $q->where('created_by', $request->integer('user_id')))

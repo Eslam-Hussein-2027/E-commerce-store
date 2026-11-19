@@ -18,7 +18,7 @@ class PurchaseController extends Controller
     public function index(Request $request): AnonymousResourceCollection
     {
         $query = Purchase::query()
-            ->with(['paidBy:id,name', 'creator:id,name', 'items.product:id,name,sku'])
+            ->with(['paidBy:id,name', 'creator:id,name', 'items.product:id,name'])
             ->when($request->filled('search'), fn ($q) => $q->where(function ($w) use ($request) {
                 $w->where('supplier', 'like', $this->likeTerm($request->string('search')))
                     ->orWhere('id', (int) ltrim($request->string('search'), '#'));
@@ -42,7 +42,7 @@ class PurchaseController extends Controller
 
     public function show(Purchase $purchase): PurchaseResource
     {
-        return new PurchaseResource($purchase->load(['items.product:id,name,sku', 'paidBy:id,name', 'creator:id,name']));
+        return new PurchaseResource($purchase->load(['items.product:id,name', 'paidBy:id,name', 'creator:id,name']));
     }
 
     public function destroy(Purchase $purchase): Response

@@ -49,13 +49,25 @@ class OrderApiTest extends TestCase
     public function stock_and_avg_cost_cannot_be_set_through_the_product_api(): void
     {
         $id = $this->postJson('/api/products', [
-            'name' => 'منتج', 'sku' => 'abc-1', 'sell_price' => 10, 'stock' => 999, 'avg_cost' => 1,
-        ])->assertCreated()->assertJsonPath('sku', 'ABC-1')->json('id');
+            'name' => 'منتج', 'sell_price' => 10, 'stock' => 999, 'avg_cost' => 1,
+        ])->assertCreated()->assertJsonPath('stock', 0)->json('id');
 
         $this->assertSame(0, Product::find($id)->stock);
 
-        $this->putJson("/api/products/{$id}", ['name' => 'منتج', 'sku' => 'ABC-1', 'sell_price' => 12, 'stock' => 50])
+        $this->putJson("/api/products/{$id}", ['name' => 'منتج', 'sell_price' => 12, 'stock' => 50])
             ->assertOk()->assertJsonPath('stock', 0);
+    }
+
+    #[Test]
+    public function product_name_must_be_unique_and_no_sku_is_needed(): void
+    {
+        $this->postJson('/api/products', ['name' => 'ساعة', 'sell_price' => 50])
+            ->assertCreated()
+            ->assertJsonMissingPath('sku');
+
+        $this->postJson('/api/products', ['name' => 'ساعة', 'sell_price' => 60])
+            ->assertStatus(422)
+            ->assertJsonPath('errors.name.0', 'قيمة الاسم مستخدمة من قبل.');
     }
 
     #[Test]

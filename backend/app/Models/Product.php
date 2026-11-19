@@ -14,7 +14,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * NOTE: `stock` and `avg_cost` are intentionally NOT fillable.
  * They are changed only by StockService / PurchaseService inside transactions.
  */
-#[Fillable(['name', 'sku', 'category_id', 'sell_price', 'reorder_level', 'is_active', 'created_by'])]
+#[Fillable(['name', 'category_id', 'sell_price', 'reorder_level', 'is_active', 'created_by'])]
 class Product extends Model
 {
     use HasCreator, HasFactory;
