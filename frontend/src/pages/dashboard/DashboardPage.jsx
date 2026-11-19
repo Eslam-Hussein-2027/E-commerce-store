@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Link } from 'react-router'
 import { useQuery } from '@tanstack/react-query'
 import {
-  AlertTriangle, Bike, Boxes, Coins, Percent, Receipt, RotateCcw, ShoppingCart, TrendingDown, TrendingUp, Wallet, PackageX,
+  AlertTriangle, Bike, Boxes, Coins, Percent, Receipt, RotateCcw, ShoppingCart, TrendingDown, TrendingUp, Users, Wallet, PackageX,
 } from 'lucide-react'
 import { api, errorMessage } from '@/lib/api'
 import { useUrlFilters } from '@/lib/useUrlFilters'
@@ -92,6 +92,8 @@ export default function DashboardPage() {
             : d?.custody.map((c) => <CustodyCard key={c.user_id} c={c} />)}
         </div>
       </section>
+
+      {d?.partners && <PartnersSection p={d.partners} />}
 
       {/* Monthly chart */}
       <Card title="المبيعات وصافي الربح — آخر 12 شهراً" className="mt-6">
@@ -184,6 +186,66 @@ export default function DashboardPage() {
   )
 }
 
+function PartnersSection({ p }) {
+  return (
+    <section className="mt-6">
+      <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
+        <h2 className="flex items-center gap-2 text-base font-bold text-slate-900">
+          <Users className="size-5 text-brand-700" /> الشركاء — نصيب كل شريك
+        </h2>
+        <Link to="/partners" className="text-xs font-semibold text-brand-700">إدارة الشركاء</Link>
+      </div>
+
+      {!p.rows.length ? (
+        <EmptyState text="لم يُضف الشركاء بعد" action={<Link to="/partners" className="font-semibold text-brand-700">إضافة الشركاء</Link>} />
+      ) : (
+        <>
+          <dl className="mb-3 grid grid-cols-2 gap-2 text-xs sm:grid-cols-4">
+            <Fact label="إجمالي رأس المال" value={p.total_capital} />
+            <Fact label="قيمة المخزون بسعر البيع" value={p.stock_sales_value} />
+            <Fact label="الربح المحقق منذ البداية" value={p.realized_profit} signed />
+            <Fact label="الربح المتوقع من المخزون" value={p.unrealized_profit} signed />
+          </dl>
+          <div className="grid gap-3 sm:grid-cols-3">
+            {p.rows.map((r) => (
+              <div key={r.id} className="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-100">
+                <div className="flex items-start justify-between gap-2">
+                  <div>
+                    <div className="font-bold text-slate-900">{r.name}</div>
+                    {r.note && <div className="text-xs text-slate-500">{r.note}</div>}
+                  </div>
+                  <span className="rounded-lg bg-brand-50 px-2 py-1 text-sm font-bold tabular-nums text-brand-800">{percent(r.share_percent)}</span>
+                </div>
+                <dl className="mt-3 space-y-1.5 border-t border-slate-100 pt-3 text-xs">
+                  <Item label="رأس المال" value={r.capital} />
+                  <Item label="نصيبه من ربح الفترة المحددة" value={r.period_profit} signed />
+                  <Item label="نصيبه من الربح المحقق كله" value={r.realized_profit} signed />
+                </dl>
+                <div className="mt-3 rounded-xl bg-slate-50 p-2.5">
+                  <div className="text-[11px] text-slate-500">المتوقع له عند بيع كل المخزون الحالي</div>
+                  <Money value={r.expected_total} className="text-lg font-bold text-slate-900" />
+                </div>
+              </div>
+            ))}
+          </div>
+          <p className="mt-2 text-[11px] leading-5 text-slate-500">
+            النسبة = رأس مال الشريك ÷ إجمالي رأس المال. «المتوقع» = نسبته × (رأس المال + الربح المحقق + ربح المخزون المتبقي إذا بيع بسعر البيع)، ويتحدث تلقائياً مع كل بيع أو مصروف أو خصم.
+          </p>
+        </>
+      )}
+    </section>
+  )
+}
+
+function Fact({ label, value, signed }) {
+  return (
+    <div className="rounded-xl bg-white p-2.5 ring-1 ring-slate-100">
+      <dt className="text-slate-500">{label}</dt>
+      <dd><Money value={value} signed={signed} className={`font-bold ${signed ? '' : 'text-slate-900'}`} /></dd>
+    </div>
+  )
+}
+
 function CustodyCard({ c }) {
   const owed = c.balance < 0
   return (
@@ -209,11 +271,11 @@ function CustodyCard({ c }) {
   )
 }
 
-function Item({ label, value }) {
+function Item({ label, value, signed }) {
   return (
     <div className="flex justify-between gap-2">
       <dt className="text-slate-500">{label}</dt>
-      <dd><Money value={value} className="font-semibold text-slate-800" /></dd>
+      <dd><Money value={value} signed={signed} className={`font-semibold ${signed ? '' : 'text-slate-800'}`} /></dd>
     </div>
   )
 }

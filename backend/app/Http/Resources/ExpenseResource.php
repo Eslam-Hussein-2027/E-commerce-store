@@ -17,7 +17,9 @@ class ExpenseResource extends JsonResource
             'amount' => (float) $this->amount,
             'expense_date' => $this->expense_date?->toDateString(),
             'paid_by_user_id' => $this->paid_by_user_id,
-            'paid_by' => $this->whenLoaded('paidBy', fn () => ['id' => $this->paidBy->id, 'name' => $this->paidBy->name]),
+            'paid_by' => $this->whenLoaded('paidBy', fn () => $this->paidBy
+                ? ['id' => $this->paidBy->id, 'name' => $this->paidBy->name]
+                : null),
             'note' => $this->note,
             'created_by_name' => $this->whenLoaded('creator', fn () => $this->creator?->name),
             'created_at' => $this->created_at?->toIso8601String(),

@@ -47,7 +47,7 @@ export default function PurchasesPage() {
           { key: 'items', header: 'الأصناف', mobile: 'subtitle', render: (p) => <span className="block max-w-64 truncate text-xs">{p.items?.map((i) => `${i.product?.name} ×${i.qty}`).join('، ')}</span> },
           { key: 'total_cost', header: 'الإجمالي', mobile: 'value', render: (p) => <Money value={p.total_cost} className="font-semibold" /> },
           { key: 'date', header: 'التاريخ', mobile: 'line', render: (p) => date(p.purchase_date) },
-          { key: 'paid_by', header: 'دفعها', mobile: 'line', render: (p) => p.paid_by?.name },
+          { key: 'paid_by', header: 'دفعها', mobile: 'line', render: (p) => p.paid_by?.name ?? 'رأس المال / الصندوق' },
         ]}
       />
       <Pagination meta={data?.meta} onPage={setPage} />

@@ -4,11 +4,10 @@ import { useFieldArray, useForm, useWatch } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Plus, Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
-import { z, optionalText, money, intNum, idField } from '@/lib/zod'
+import { z, optionalText, money, intNum, idField, optionalId } from '@/lib/zod'
 import { applyServerErrors } from '@/lib/api'
 import { useProductOptions, useSave } from '@/lib/queries'
 import { isoDate, money as fmtMoney, toNumber } from '@/lib/format'
-import { useAuth } from '@/auth/AuthContext'
 import PageHeader from '@/components/ui/PageHeader'
 import Card from '@/components/ui/Card'
 import Button from '@/components/ui/Button'
@@ -19,7 +18,7 @@ import { ListSkeleton } from '@/components/ui/Skeleton'
 const schema = z.object({
   supplier: optionalText(),
   purchase_date: z.string().min(1, 'اختر التاريخ'),
-  paid_by_user_id: idField('اختر من دفع'),
+  paid_by_user_id: optionalId(),
   note: optionalText(),
   items: z
     .array(z.object({
@@ -47,7 +46,6 @@ const weightedAverage = (stock, avg, qty, cost) => {
 
 export default function PurchaseFormPage() {
   const navigate = useNavigate()
-  const { user } = useAuth()
   const { data: productsRes, isLoading } = useProductOptions()
   const save = useSave('purchases')
   const products = productsRes?.data ?? []
@@ -55,7 +53,7 @@ export default function PurchaseFormPage() {
 
   const { register, control, handleSubmit, setError, formState: { errors } } = useForm({
     resolver: zodResolver(schema),
-    defaultValues: { supplier: '', purchase_date: isoDate(), paid_by_user_id: user?.id, note: '', items: [emptyRow] },
+    defaultValues: { supplier: '', purchase_date: isoDate(), paid_by_user_id: '', note: '', items: [emptyRow] },
   })
   const { fields, append, remove } = useFieldArray({ control, name: 'items' })
   const items = useWatch({ control, name: 'items' })
@@ -86,8 +84,8 @@ export default function PurchaseFormPage() {
             <FormField label="تاريخ الشراء" required error={errors.purchase_date?.message}>
               <Input type="date" {...register('purchase_date')} />
             </FormField>
-            <FormField label="دفعها" required error={errors.paid_by_user_id?.message} hint="تُخصم من عهدته">
-              <UserSelect {...register('paid_by_user_id')} />
+            <FormField label="دفعها" error={errors.paid_by_user_id?.message} hint="اختر أخاً فقط إذا دفع من النقود التي معه، فتُخصم من عهدته">
+              <UserSelect placeholder="من رأس المال / الصندوق" {...register('paid_by_user_id')} />
             </FormField>
             <FormField label="ملاحظة" className="col-span-2 lg:col-span-1">
               <Textarea {...register('note')} />

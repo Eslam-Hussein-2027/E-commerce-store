@@ -3,13 +3,12 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Plus, Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
-import { z, money, idField, optionalText } from '@/lib/zod'
+import { z, money, optionalId, optionalText } from '@/lib/zod'
 import { applyServerErrors, errorMessage } from '@/lib/api'
 import { useList, useRemove, useSave } from '@/lib/queries'
 import { useUrlFilters } from '@/lib/useUrlFilters'
 import { date, isoDate, money as fmtMoney } from '@/lib/format'
 import { EXPENSE_CATEGORIES } from '@/lib/constants'
-import { useAuth } from '@/auth/AuthContext'
 import PageHeader from '@/components/ui/PageHeader'
 import Table from '@/components/ui/Table'
 import Button from '@/components/ui/Button'
@@ -27,7 +26,7 @@ const schema = z.object({
   category: z.enum(['ads', 'packaging', 'other'], { error: 'اختر نوع المصروف' }),
   amount: money({ positive: true }),
   expense_date: z.string().min(1, 'اختر التاريخ'),
-  paid_by_user_id: idField('اختر من دفع'),
+  paid_by_user_id: optionalId(),
   note: optionalText(),
 })
 
@@ -60,7 +59,7 @@ export default function ExpensesPage() {
           { key: 'category', header: 'النوع', mobile: 'title', render: (e) => <Badge tone="sky">{e.category_label}</Badge> },
           { key: 'amount', header: 'المبلغ', mobile: 'value', render: (e) => <Money value={e.amount} className="font-semibold" /> },
           { key: 'expense_date', header: 'التاريخ', mobile: 'line', render: (e) => date(e.expense_date) },
-          { key: 'paid_by', header: 'دفعها', mobile: 'line', render: (e) => e.paid_by?.name },
+          { key: 'paid_by', header: 'دفعها', mobile: 'line', render: (e) => e.paid_by?.name ?? 'رأس المال / الصندوق' },
           { key: 'note', header: 'ملاحظة', mobile: 'subtitle', render: (e) => e.note || '—', className: 'max-w-xs truncate' },
         ]}
       />
@@ -71,7 +70,6 @@ export default function ExpensesPage() {
 }
 
 function ExpenseModal({ expense, onClose }) {
-  const { user } = useAuth()
   const save = useSave('expenses')
   const remove = useRemove('expenses')
   const confirm = useConfirm()
@@ -83,7 +81,7 @@ function ExpenseModal({ expense, onClose }) {
       category: expense.category ?? 'ads',
       amount: expense.amount ?? '',
       expense_date: expense.expense_date ?? isoDate(),
-      paid_by_user_id: expense.paid_by_user_id ?? user?.id,
+      paid_by_user_id: expense.paid_by_user_id ?? '',
       note: expense.note ?? '',
     },
   })
@@ -127,8 +125,8 @@ function ExpenseModal({ expense, onClose }) {
         <FormField label="التاريخ" required error={errors.expense_date?.message}>
           <Input type="date" {...register('expense_date')} />
         </FormField>
-        <FormField label="دفعها" required error={errors.paid_by_user_id?.message} hint="تُخصم من عهدته">
-          <UserSelect {...register('paid_by_user_id')} />
+        <FormField label="دفعها" error={errors.paid_by_user_id?.message} hint="أخ = تُخصم من عهدته">
+          <UserSelect placeholder="من رأس المال / الصندوق" {...register('paid_by_user_id')} />
         </FormField>
         <FormField label="ملاحظة" className="col-span-2">
           <Textarea {...register('note')} />

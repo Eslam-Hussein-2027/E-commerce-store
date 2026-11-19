@@ -18,6 +18,7 @@ const ExpensesPage = lazy(() => import('./pages/ExpensesPage'))
 const AdjustmentsPage = lazy(() => import('./pages/AdjustmentsPage'))
 const HandoversPage = lazy(() => import('./pages/HandoversPage'))
 const MovementsPage = lazy(() => import('./pages/MovementsPage'))
+const PartnersPage = lazy(() => import('./pages/PartnersPage'))
 const AccountPage = lazy(() => import('./pages/AccountPage'))
 const NotFoundPage = lazy(() => import('./pages/NotFoundPage'))
 
@@ -53,6 +54,7 @@ export default function App() {
           <Route path="adjustments" element={<Lazy><AdjustmentsPage /></Lazy>} />
           <Route path="handovers" element={<Lazy><HandoversPage /></Lazy>} />
           <Route path="movements" element={<Lazy><MovementsPage /></Lazy>} />
+          <Route path="partners" element={<Lazy><PartnersPage /></Lazy>} />
           <Route path="account" element={<Lazy><AccountPage /></Lazy>} />
           <Route path="*" element={<Lazy><NotFoundPage /></Lazy>} />
         </Route>

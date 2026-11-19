@@ -11,7 +11,8 @@ class PurchaseRequest extends FormRequest
         return [
             'supplier' => ['nullable', 'string', 'max:150'],
             'purchase_date' => ['required', 'date'],
-            'paid_by_user_id' => ['required', 'integer', 'exists:users,id'],
+            // Empty = paid from partners' capital / store box (no brother's custody changes).
+            'paid_by_user_id' => ['nullable', 'integer', 'exists:users,id'],
             'note' => ['nullable', 'string', 'max:1000'],
             'items' => ['required', 'array', 'min:1', 'max:100'],
             'items.*.product_id' => ['required', 'integer', 'distinct', 'exists:products,id'],

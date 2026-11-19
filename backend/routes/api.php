@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\ExpenseController;
 use App\Http\Controllers\Api\OrderController;
+use App\Http\Controllers\Api\PartnerController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\PurchaseController;
 use App\Http\Controllers\Api\StockAdjustmentController;
@@ -36,6 +37,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::patch('orders/{order}/status', [OrderController::class, 'updateStatus']);
 
     Route::apiResource('expenses', ExpenseController::class);
+    Route::apiResource('partners', PartnerController::class);
     Route::apiResource('cash-handovers', CashHandoverController::class);
     Route::apiResource('stock-adjustments', StockAdjustmentController::class)->only(['index', 'store', 'show']);
     Route::get('stock-movements', [StockMovementController::class, 'index']);

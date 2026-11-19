@@ -16,7 +16,9 @@ class PurchaseResource extends JsonResource
             'purchase_date' => $this->purchase_date?->toDateString(),
             'total_cost' => (float) $this->total_cost,
             'paid_by_user_id' => $this->paid_by_user_id,
-            'paid_by' => $this->whenLoaded('paidBy', fn () => ['id' => $this->paidBy->id, 'name' => $this->paidBy->name]),
+            'paid_by' => $this->whenLoaded('paidBy', fn () => $this->paidBy
+                ? ['id' => $this->paidBy->id, 'name' => $this->paidBy->name]
+                : null),
             'note' => $this->note,
             'items_count' => $this->whenCounted('items'),
             'items' => $this->whenLoaded('items', fn () => $this->items->map(fn ($item) => [

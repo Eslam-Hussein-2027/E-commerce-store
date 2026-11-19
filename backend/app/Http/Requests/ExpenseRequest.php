@@ -14,7 +14,8 @@ class ExpenseRequest extends FormRequest
             'category' => ['required', Rule::enum(ExpenseCategory::class)],
             'amount' => ['required', 'numeric', 'gt:0', 'max:9999999'],
             'expense_date' => ['required', 'date'],
-            'paid_by_user_id' => ['required', 'integer', 'exists:users,id'],
+            // Empty = paid from partners' capital / store box (no brother's custody changes).
+            'paid_by_user_id' => ['nullable', 'integer', 'exists:users,id'],
             'note' => ['nullable', 'string', 'max:1000'],
         ];
     }

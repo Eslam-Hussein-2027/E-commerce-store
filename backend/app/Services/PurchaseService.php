@@ -29,7 +29,7 @@ class PurchaseService
     }
 
     /**
-     * @param  array{supplier?:string|null, purchase_date:string, paid_by_user_id:int, note?:string|null,
+     * @param  array{supplier?:string|null, purchase_date:string, paid_by_user_id?:int|null, note?:string|null,
      *               items: array<int, array{product_id:int, qty:int, unit_cost:float|string}>}  $data
      */
     public function create(array $data): Purchase
@@ -40,7 +40,7 @@ class PurchaseService
             $purchase = Purchase::create([
                 'supplier' => $data['supplier'] ?? null,
                 'purchase_date' => $data['purchase_date'],
-                'paid_by_user_id' => $data['paid_by_user_id'],
+                'paid_by_user_id' => $data['paid_by_user_id'] ?? null,
                 'note' => $data['note'] ?? null,
                 'total_cost' => 0,
             ]);

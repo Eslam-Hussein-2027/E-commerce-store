@@ -1,5 +1,5 @@
 import {
-  ClipboardList, HandCoins, History, KeyRound, LayoutDashboard, Package, PackageMinus, Receipt, ShoppingCart, Tags, Truck,
+  ClipboardList, HandCoins, History, KeyRound, LayoutDashboard, Package, PackageMinus, Receipt, ShoppingCart, Tags, Truck, Users,
 } from 'lucide-react'
 
 export const NAV = [
@@ -10,6 +10,7 @@ export const NAV = [
   { to: '/categories', label: 'التصنيفات', icon: Tags },
   { to: '/expenses', label: 'المصروفات', icon: Receipt },
   { to: '/handovers', label: 'تسليم النقدية', icon: HandCoins },
+  { to: '/partners', label: 'الشركاء', icon: Users },
   { to: '/adjustments', label: 'تسويات المخزون', icon: PackageMinus },
   { to: '/movements', label: 'سجل حركة المخزون', icon: History },
   { to: '/account', label: 'الحساب', icon: KeyRound },

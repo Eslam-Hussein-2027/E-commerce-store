@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Enums\OrderStatus;
+use App\Models\Partner;
 use App\Models\User;
 use Carbon\CarbonImmutable;
 use Carbon\CarbonInterface;
@@ -28,14 +29,17 @@ class DashboardService
         $to = CarbonImmutable::instance($to)->endOfDay();
         $now = CarbonImmutable::now();
 
+        $financials = $this->financials($from, $to);
+
         return [
             'period' => ['from' => $from->toDateString(), 'to' => $to->toDateString()],
             'kpis' => array_merge(
-                $this->financials($from, $to),
+                $financials,
                 $this->orderRates($from, $to),
                 ['stock_value' => $this->stockValue()],
             ),
             'custody' => $this->custody(),
+            'partners' => $this->partners($financials['net_profit']),
             'monthly' => $this->monthly(12),
             'top_products_by_qty' => $this->topProducts($from, $to, 'qty'),
             'top_products_by_profit' => $this->topProducts($from, $to, 'profit'),
@@ -168,6 +172,48 @@ class DashboardService
                 'balance' => round($c - $p - $e - $h, 2),
             ];
         })->all();
+    }
+
+    /**
+     * Partners' shares (share = capital / total capital):
+     *  - period_profit:   share × net profit of the selected period
+     *  - realized_profit: share × net profit since the beginning
+     *  - expected_total:  what he gets if all current stock sells at its listed price
+     *                     = share × (total capital + realized net profit + unrealized profit on stock)
+     */
+    public function partners(float $periodNetProfit): array
+    {
+        $partners = Partner::query()->orderByDesc('capital')->orderBy('id')->get();
+        $totalCapital = (float) $partners->sum('capital');
+
+        $realized = $this->financials(CarbonImmutable::create(2000, 1, 1), CarbonImmutable::now()->endOfDay())['net_profit'];
+        $stock = DB::table('products')
+            ->selectRaw('COALESCE(SUM(stock * sell_price), 0) as sales_value, COALESCE(SUM(stock * avg_cost), 0) as cost_value')
+            ->first();
+        $unrealized = (float) $stock->sales_value - (float) $stock->cost_value;
+        $pool = $totalCapital + $realized + $unrealized;
+
+        return [
+            'total_capital' => round($totalCapital, 2),
+            'realized_profit' => round($realized, 2),
+            'stock_sales_value' => round((float) $stock->sales_value, 2),
+            'unrealized_profit' => round($unrealized, 2),
+            'expected_pool' => round($pool, 2),
+            'rows' => $partners->map(function (Partner $p) use ($totalCapital, $periodNetProfit, $realized, $pool) {
+                $share = $totalCapital > 0 ? (float) $p->capital / $totalCapital : 0.0;
+
+                return [
+                    'id' => $p->id,
+                    'name' => $p->name,
+                    'note' => $p->note,
+                    'capital' => round((float) $p->capital, 2),
+                    'share_percent' => round($share * 100, 2),
+                    'period_profit' => round($share * $periodNetProfit, 2),
+                    'realized_profit' => round($share * $realized, 2),
+                    'expected_total' => round($share * $pool, 2),
+                ];
+            })->all(),
+        ];
     }
 
     /** Revenue / gross profit / expenses / losses / net profit for the last N months. */

@@ -25,7 +25,7 @@ export default function PurchaseDetailsPage() {
   const onDelete = async () => {
     const ok = await confirm({
       title: 'حذف فاتورة الشراء',
-      message: `سيتم خصم كميات الفاتورة من المخزون وإعادة حساب متوسط التكلفة، وتُلغى من عهدة ${p.paid_by?.name}. لا يمكن الحذف إذا بيعت أي كمية منها.`,
+      message: `سيتم خصم كميات الفاتورة من المخزون وإعادة حساب متوسط التكلفة، ${p.paid_by ? `وتُلغى من عهدة ${p.paid_by.name}.` : ''} لا يمكن الحذف إذا بيعت أي كمية منها.`,
       confirmText: 'حذف الفاتورة',
     })
     if (!ok) return
@@ -59,7 +59,7 @@ export default function PurchaseDetailsPage() {
         </ul>
         <div className="space-y-1.5 border-t border-slate-100 bg-slate-50/60 px-4 py-3 text-sm">
           <div className="flex justify-between"><span className="text-slate-500">الإجمالي</span><Money value={p.total_cost} className="text-base font-bold" /></div>
-          <div className="flex justify-between"><span className="text-slate-500">دفعها</span><span className="font-semibold">{p.paid_by?.name}</span></div>
+          <div className="flex justify-between"><span className="text-slate-500">دفعها</span><span className="font-semibold">{p.paid_by?.name ?? 'رأس المال / الصندوق'}</span></div>
           <div className="flex justify-between"><span className="text-slate-500">سجّلها</span><span>{p.created_by_name ?? '—'}</span></div>
           {p.note && <p className="rounded-lg bg-amber-50 p-2 text-amber-900">{p.note}</p>}
         </div>
