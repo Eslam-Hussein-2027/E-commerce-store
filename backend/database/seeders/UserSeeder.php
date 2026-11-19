@@ -12,7 +12,7 @@ class UserSeeder extends Seeder
 {
     public function run(): void
     {
-        User::updateOrCreate(['email' => 'ahmed@store.local'], ['name' => 'أحمد', 'password' => 'password']);
+        User::updateOrCreate(['email' => 'eslam@store.local'], ['name' => 'إسلام', 'password' => 'password']);
         User::updateOrCreate(['email' => 'mohamed@store.local'], ['name' => 'محمد', 'password' => 'password']);
     }
 }

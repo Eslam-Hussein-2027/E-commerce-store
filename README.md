@@ -218,7 +218,7 @@ php artisan migrate:fresh --seed --force
 
 | الاسم | البريد | كلمة المرور |
 |---|---|---|
-| أحمد | `ahmed@store.local` | `password` |
+| إسلام | `eslam@store.local` | `password` |
 | محمد | `mohamed@store.local` | `password` |
 
 > **غيّر كلمتي المرور فوراً** من صفحة «الحساب» داخل النظام.
