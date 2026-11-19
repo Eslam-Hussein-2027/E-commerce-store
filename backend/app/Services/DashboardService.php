@@ -71,7 +71,7 @@ class DashboardService
 
         $grossProfit = (float) $items->gross_profit;
         $expenses = (float) DB::table('expenses')
-            ->whereBetween('expense_date', [$from->toDateString(), $to->toDateString()])
+            ->whereBetween('expense_date', [$from, $to])
             ->sum('amount');
         $stockLosses = $this->stockLosses($from, $to);
         $netProfit = $grossProfit - $expenses - $stockLosses;
@@ -104,7 +104,7 @@ class DashboardService
     public function orderRates(CarbonInterface $from, CarbonInterface $to): array
     {
         $rows = DB::table('orders')
-            ->whereBetween('order_date', [$from->toDateString(), $to->toDateString()])
+            ->whereBetween('order_date', [$from, $to])
             ->selectRaw('status, COUNT(*) as c')
             ->groupBy('status')
             ->pluck('c', 'status');
@@ -190,7 +190,7 @@ class DashboardService
             ->groupBy('m')->pluck('total', 'm');
 
         $expenses = DB::table('expenses')
-            ->whereBetween('expense_date', [$start->toDateString(), $end->toDateString()])
+            ->whereBetween('expense_date', [$start, $end])
             ->selectRaw($this->monthExpr('expense_date').' as m, SUM(amount) as total')
             ->groupBy('m')->pluck('total', 'm');
 

@@ -1,0 +1,11 @@
+{
+    "The given data was invalid.": "البيانات المدخلة غير صحيحة.",
+    "Unauthenticated.": "يجب تسجيل الدخول أولاً.",
+    "This action is unauthorized.": "غير مصرح لك بهذا الإجراء.",
+    "Not Found": "غير موجود",
+    "Too Many Attempts.": "محاولات كثيرة، حاول لاحقاً.",
+    "CSRF token mismatch.": "انتهت صلاحية الجلسة، أعد تحميل الصفحة.",
+    "Server Error": "خطأ في الخادم",
+    "(and :count more error)": "(وخطأ آخر)",
+    "(and :count more errors)": "(و :count أخطاء أخرى)"
+}
